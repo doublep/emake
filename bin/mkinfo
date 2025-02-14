@@ -1,0 +1,24 @@
+#!/usr/bin/bash
+#
+# Convert README.adoc to eldev.info.
+#
+# Command versions tested:
+#
+# - Asciidoctor 2.0.18
+# - pandoc 2.17.1.1
+# - GNU Emacs 30.0.93
+# - texi2any (GNU texinfo) 6.8
+
+filename=doc/README
+output=doc/eldev.info
+
+{
+  asciidoctor -b html -o "$filename".html "$filename".adoc
+  pandoc "$filename".html -f html -t org -o "$filename".org
+  emacs -Q -batch -L ./ -l bin/mkinfo.el -f make-info "$filename".org
+  makeinfo "$filename".texi -o "$output"
+} || {
+  :
+}
+
+rm -f "$filename".html "$filename".org "$filename".texi
